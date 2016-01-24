@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zrender</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="asset/js/esl/esl.js"></script>
+    <link href="asset/css/bootstrap.css" rel="stylesheet">
+    <link href="asset/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="asset/css/zrenderHome.css" rel="stylesheet">
+    <link rel="shortcut icon" href="asset/ico/favicon.png">
+</head>
+<body>
+<div id="main" class="main"></div>
+
+<script type="text/javascript">
+    var zr;
+    var developMode = true;
+    if (developMode) {
+        require.config({
+            packages: [
+                {
+                    name: 'zrender',
+                    location: 'lib/zrender/src',
+                    main: 'zrender'
+                }
+            ]
+        });
+    }
+    require(['zrender','zrender/shape/Line'],
+            function(zrender,Line) {
+                zr = zrender.init(document.getElementById('main'));
+                zr.clear();
+
+                var zrColor = require('zrender/tool/color');
+                var width = Math.ceil(zr.getWidth());
+                var height = Math.ceil(zr.getHeight());
+
+                //路线长度
+                var roadLength=139151;
+                //单元数
+                var pileNum=Math.ceil(roadLength/1000);
+                //绘制单元长度
+                var pileWidth=30;
+
+                function init(){
+                    zr.clear();
+
+                    var cols=Math.floor(width/pileWidth);
+                    var rows=Math.ceil(pileNum/cols);
+
+                    for(var row=1;row<=rows;row++){
+                        for(var col=1;col<=cols;col++){
+                            if(row*col<=pileNum) {
+                                var shape = new Line({
+                                    style: {
+                                        xStart: (col-1) * pileWidth,
+                                        yStart: (row) * 50,
+                                        xEnd: (col-1) * pileWidth+pileWidth,
+                                        yEnd: (row) * 50,
+                                        strokeColor: '#ff00ff',
+                                        lineWidth: 10
+                                    },
+                                    pileNum:row*col,
+                                    clickable : true,
+                                    onclick : onPileClick
+                                });
+                                zr.addElement(shape);
+                            }
+                        }
+                    }
+                    zr.render();
+                }
+
+                function onPileClick(params) {
+                    var target = params.target;
+                    alert(target.pileNum);
+                }
+
+                init();
+            });
+
+</script>
+<script src="asset/js/jquery.js"></script>
+</body>
+</html>
